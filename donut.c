@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <sys/ioctl.h>
 
 #include <unistd.h>
 
@@ -56,13 +57,15 @@ void _print_2D_donut(int rx, int ry, int rz)
 {
     // int R = 12; // the outer bigger radius
     // int r = 6; // the inner radius
-    int R = 24, r = 15;
+    int R = 18, r = 7;
     char donut[rx+1][ry+1];
 
     int rem = rz / 12;
 
     double theta = 0.01;
     while (1) {
+        printf("\033[H"); // home, go to the top left of the screen
+        printf("DONUT\n");
         for (int i=0; i<rx+1; i++) {
             for (int j=0; j<ry+1; j++) {
                 donut[i][j] = ' ';
@@ -109,13 +112,14 @@ void _print_2D_donut(int rx, int ry, int rz)
                 }
             }
         }
-        for (int i=0; i<rx+1; i+=2) printf("\033[A");
+        // for (int i=0; i<rx+1; i+=2) printf("\033[A");
         for (int i=0; i<rx+1; i+=2) {
             for (int j=0; j<ry+1; j++) {
                 printf("%c", donut[i][j]);
             }
             printf("\n");
         }
+        fflush(stdout);
         theta += 0.01;
     }
 }
@@ -123,9 +127,11 @@ void _print_2D_donut(int rx, int ry, int rz)
 int main(int argc, char* argv[])
 {
     // int range_x = 50, range_y = 50, range_z = 50;
-    int range_x = 80, range_y = 80, range_z = 80;
-    printf("DONUT\n\n");
-    _print_screen(range_x, range_y);
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    int range_x = 60, range_y = 60, range_z = 60;
+    printf("\033[2J"); // clear screen
+    // _print_screen(range_x, range_y);
     _print_2D_donut(range_x, range_y, range_z);
     return 0;
 }
